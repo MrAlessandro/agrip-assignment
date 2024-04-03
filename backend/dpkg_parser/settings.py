@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "core",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -86,6 +87,10 @@ DATABASES = {
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
         "NAME": os.environ.get("POSTGRES_DB", "dpkg_parser"),
     }
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
 }
 
 # Cache
