@@ -2,6 +2,9 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss"],
+  build: {
+    transpile: ["@heroicons/vue"],
+  },
   tailwindcss: {
     exposeConfig: true,
     viewer: true,

@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 useHead({
   bodyAttrs: {
     class: "font-sans antialiased min-h-[100dvh]",

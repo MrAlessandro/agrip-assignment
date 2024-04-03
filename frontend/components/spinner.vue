@@ -1,5 +1,5 @@
 <template>
-  <span class="loader after:border-primary"></span>
+  <span class="loader before:border-blue-500"></span>
 </template>
 
 <style scoped>
@@ -16,7 +16,8 @@
   position: absolute;
   inset: 0px;
   border-radius: 50%;
-  border: 5px solid red;
+  border-width: 5px;
+  border-style: solid;
   animation: prixClipFix 2s linear infinite;
 }
 

@@ -1,42 +1,92 @@
 <template>
-  <div class="container pt-14">
+  <div class="container py-4 lg:py-14">
     <h1 class="uppercase text-4xl font-bold">DPKG Status</h1>
-    <div v-if="loading"></div>
+    <div
+      v-if="loading"
+      class="w-full min-h-56 flex justify-center items-center">
+      <spinner></spinner>
+    </div>
     <div v-else>
-      <div v-for="pakage in pakages" :key="pakage.id">
-        <div class="bg-gray-100 p-4 my-4 rounded-lg flex items-center">
+      <div v-for="pack in packs" :key="pack.id">
+        <div class="bg-gray-100 p-4 my-4 rounded-lg md:flex md:items-center">
           <div class="grow">
-            <h2 class="text-xl font-bold">{{ pakage.name }}</h2>
-            <p class="line-clamp-1">{{ pakage.description }}</p>
+            <h2 class="text-xl font-bold">
+              {{ pack.name }}
+              <small class="font-normal">{{ pack.version }}</small>
+            </h2>
+            <p class="line-clamp-1 mb-1">{{ pack.description }}</p>
+            <p v-if="(pack.dependencies?.length || 0) > 0" class="line-clamp-1">
+              <strong>Dependencies: </strong>
+              <span v-for="(dep, index) in pack.dependencies">
+                <RouterLink
+                  :to="`/packages/${dep.id}`"
+                  class="text-blue-500 hover:underline">
+                  {{ dep.name }} </RouterLink
+                >{{ index == pack.dependencies.length - 1 ? "" : ", " }}
+              </span>
+            </p>
           </div>
-          <div class="flex items-center">
+          <div class="flex items-center mt-3 md:mt-0 md:ml-2 w-full md:w-fit">
             <router-link
-              :to="`/packages/${pakage.id}`"
-              class="bg-blue-500 text-white px-4 py-2 rounded-lg">
+              :to="`/packages/${pack.id}`"
+              class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center w-full md:w-fit justify-center">
               Details
+              <ChevronRightIcon class="w-6 h-6 ml-1"></ChevronRightIcon>
             </router-link>
           </div>
         </div>
+      </div>
+      <div
+        v-if="nextPageLoading"
+        class="w-full min-h-56 flex justify-center items-center">
+        <spinner></spinner>
+      </div>
+      <div v-if="packs.length > 0 && nextPage == undefined" class="py-14">
+        <p class="text-center text-gray-500">No more packages</p>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-const loading = ref(true);
-const pakages = ref([]);
-const page = ref(1);
-const totalPages = ref(0);
+import { ChevronRightIcon } from "@heroicons/vue/24/solid";
 
-const fetchPackages = async () => {
-  const response = await fetch("http://localhost:8000/api/packages/");
+const loading = ref(true);
+const packs = ref<any[]>([]);
+const nextPage = ref<string | undefined>();
+const nextPageLoading = ref(false);
+
+const fetchPackages = async (url: string) => {
+  const response = await fetch(url);
   const data = await response.json();
-  pakages.value = data.results;
+  packs.value.push(...data.results);
+  if (data.next) {
+    nextPage.value = data.next;
+  } else {
+    nextPage.value = undefined;
+  }
   loading.value = false;
 };
 
 onMounted(() => {
-  fetchPackages().then(() => {
+  window.addEventListener("scroll", handleScroll);
+  fetchPackages("http://localhost:8000/api/packages/").then(() => {
     loading.value = false;
   });
 });
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+
+const handleScroll = (e: Event) => {
+  const reachBottom =
+    document.documentElement.scrollTop + window.innerHeight >=
+    document.documentElement.offsetHeight;
+  if (reachBottom && nextPage.value && !nextPageLoading.value) {
+    nextPageLoading.value = true;
+    fetchPackages(nextPage.value).then(() => {
+      nextPageLoading.value = false;
+    });
+  }
+};
 </script>
