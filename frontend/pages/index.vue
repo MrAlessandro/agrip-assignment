@@ -2,6 +2,21 @@
   <div class="container py-4 lg:py-14">
     <h1 class="uppercase text-4xl font-bold">DPKG Status</h1>
     <div
+      class="w-full overflow-hidden border border-gray-300 rounded-lg mt-4 flex items-center">
+      <input
+        type="text"
+        v-model="search"
+        class="grow p-2 focus:ring-none focus:outline-none"
+        placeholder="Search packages..." />
+      <MagnifyingGlassIcon
+        v-if="search.length == 0"
+        class="w-8 h-8 pr-2"></MagnifyingGlassIcon>
+      <XCircleIcon
+        v-if="search.length > 0"
+        @click="search = ''"
+        class="w-8 h-8 pr-2 cursor-pointer"></XCircleIcon>
+    </div>
+    <div
       v-if="loading"
       class="w-full min-h-56 flex justify-center items-center">
       <spinner></spinner>
@@ -48,15 +63,40 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ChevronRightIcon } from "@heroicons/vue/24/solid";
+import {
+  ChevronRightIcon,
+  MagnifyingGlassIcon,
+  XCircleIcon,
+} from "@heroicons/vue/24/solid";
 
 const loading = ref(true);
 const packs = ref<any[]>([]);
 const nextPage = ref<string | undefined>();
 const nextPageLoading = ref(false);
+const search = ref("");
+
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+watch(search, () => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+
+  debounceTimer = setTimeout(() => {
+    loading.value = true;
+    packs.value = [];
+    fetchPackages("http://localhost:8000/api/packages/").then(() => {
+      loading.value = false;
+    });
+  }, 500); // Adjust the debounce delay as needed (in milliseconds)
+});
 
 const fetchPackages = async (url: string) => {
-  const response = await fetch(url);
+  let pUrl = new URL(url);
+  if (search.value) {
+    pUrl.searchParams.set("search", search.value);
+  }
+  const response = await fetch(pUrl);
   const data = await response.json();
   packs.value.push(...data.results);
   if (data.next) {
