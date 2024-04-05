@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  postgres:
+    restart: always
+    image: "postgres:15-alpine"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+  redis:
+    restart: always
+    image: "redis:7.2.4-alpine"
+  backend:
+    restart: always
+    build:
+      context: ./backend
+    command: gunicorn dpkg_parser.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - redis
+  celery_beat:
+    restart: always
+    build:
+      context: ./backend
+    command: celery -A dpkg_parser beat -l info
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+  frontend:
+    restart: always
+    build:
+      context: ./frontend
+    ports:
+      - 3000:80
+    env_file:
+      - ./.env
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

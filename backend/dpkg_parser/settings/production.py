@@ -1,4 +1,3 @@
-from dpkg_parser.settings import CORS_ALLOWED_ORIGINS
 from .base import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -42,7 +41,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CORS_ALLOWED_ORIGINS = os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS").split(",")
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
+CELERY_BROKER_URL = (
+    f"redis://{os.environ.get('REDIS_HOST')}:{os.environ.get('REDIS_PORT')}"
+)
+CELERY_RESULT_BACKEND = (
+    f"redis://{os.environ.get('REDIS_HOST')}:{os.environ.get('REDIS_PORT')}"
+)
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
