@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.db import transaction
 
 from core.models import Dependency, Package
 from core.serializers import PackageImportSerializer
@@ -99,11 +99,16 @@ def import_packages(file_path):
     with open(file_path, "r") as file:
         package_data = file.read()
 
-    packages = package_data.split("\n\n")
+    packages_data = package_data.split("\n\n")
+    packages = []
     dependencies = []
-    for package in packages:
-        if package:
-            dep = parse_package(package)
-            dependencies += dep
-    Dependency.objects.all().delete()
-    Dependency.objects.bulk_create(dependencies)
+    with transaction.atomic():
+        # Clear all data
+        Dependency.objects.all().delete()
+        Package.objects.all().delete()
+        # Import new data
+        for package in packages_data:
+            if package:
+                dep = parse_package(package)
+                dependencies += dep
+        Dependency.objects.bulk_create(dependencies)

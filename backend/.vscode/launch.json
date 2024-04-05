@@ -12,7 +12,32 @@
             "args": [
                 "runserver"
             ],
+            "console": "integratedTerminal",
             "django": true,
+            "autoStartBrowser": false,
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "dpkg_parser.settings.development"
+            },
+        },
+        {
+            "name": "celery-beat",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/venv/bin/celery",
+            "args": [
+                "-A",
+                "dpkg_parser",
+                "worker",
+                "--beat",
+                "--pool",
+                "solo",
+                "-l",
+                "info"
+            ],
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "dpkg_parser.settings.development"
+            },
+            "console": "integratedTerminal",
             "autoStartBrowser": false,
             "envFile": "${workspaceFolder}/.env"
         },
