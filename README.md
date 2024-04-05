@@ -1,4 +1,4 @@
-# AGRIP ASSIGNMENT
+# AGRIPLACE ASSIGNMENT
 
 ## Deploy Instructions
 
