@@ -83,13 +83,14 @@
 import { onMounted, ref } from "vue";
 import { HomeIcon, ChevronLeftIcon, PlusIcon } from "@heroicons/vue/24/solid";
 
+const runtimeConfig = useRuntimeConfig();
 const route = useRoute();
 const loading = ref(true);
 const pack = ref<any>();
 
 const fetchPackage = async () => {
   const response = await fetch(
-    `http://localhost:8000/api/packages/${route.params.id}/`
+    `${runtimeConfig.public.baseURL}/packages/${route.params.id}/`
   );
   const data = await response.json();
   pack.value = data;

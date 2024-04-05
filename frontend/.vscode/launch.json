@@ -10,7 +10,10 @@
       "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v18.16.0/bin/npm",
       "runtimeArgs": ["run", "dev"],
       "skipFiles": ["node_internals/**"],
-      "type": "node"
+      "type": "node",
+      "env": {
+        "BACKEND_BASE_URL": "http://localhost:8000"
+      }
     }
   ]
 }

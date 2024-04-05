@@ -69,6 +69,7 @@ import {
   XCircleIcon,
 } from "@heroicons/vue/24/solid";
 
+const runtimeConfig = useRuntimeConfig();
 const loading = ref(true);
 const packs = ref<any[]>([]);
 const nextPage = ref<string | undefined>();
@@ -85,7 +86,7 @@ watch(search, () => {
   debounceTimer = setTimeout(() => {
     loading.value = true;
     packs.value = [];
-    fetchPackages("http://localhost:8000/api/packages/").then(() => {
+    fetchPackages(`${runtimeConfig.public.baseURL}/packages/`).then(() => {
       loading.value = false;
     });
   }, 500); // Adjust the debounce delay as needed (in milliseconds)
@@ -109,7 +110,7 @@ const fetchPackages = async (url: string) => {
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
-  fetchPackages("http://localhost:8000/api/packages/").then(() => {
+  fetchPackages(`${runtimeConfig.public.baseURL}/packages/`).then(() => {
     loading.value = false;
   });
 });

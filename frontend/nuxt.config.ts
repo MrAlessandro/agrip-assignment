@@ -9,4 +9,11 @@ export default defineNuxtConfig({
     exposeConfig: true,
     viewer: true,
   },
+  runtimeConfig: {
+    public: {
+      baseURL: `${
+        process.env.NUXT_BACKEND_BASE_URL || "http://localhost:8000/"
+      }api`,
+    },
+  },
 });
